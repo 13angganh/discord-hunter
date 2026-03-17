@@ -14,217 +14,122 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060a0f;
-    --panel: #0d1520;
-    --panel2: #111d2e;
-    --border: #1a3050;
-    --accent: #00d4ff;
-    --accent2: #ff6b35;
-    --green: #00ff88;
-    --red: #ff3366;
-    --yellow: #ffcc00;
-    --text: #c8ddf0;
-    --dim: #4a6a8a;
+    --bg: #060a0f; --panel: #0d1520; --border: #1a3050;
+    --accent: #00d4ff; --accent2: #ff6b35; --green: #00ff88;
+    --red: #ff3366; --yellow: #ffcc00; --text: #c8ddf0; --dim: #4a6a8a;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; overscroll-behavior: none; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overscroll-behavior:none; }
+  body { background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  #install-bar { display:none; position:sticky; top:0; z-index:100; background:linear-gradient(90deg,#0d1520,#111d2e); border-bottom:2px solid var(--accent2); padding:10px 16px; align-items:center; gap:10px; font-size:0.85rem; }
+  #install-bar.show { display:flex; }
+  #notif-bar { display:none; background:rgba(255,204,0,0.08); border-bottom:1px solid rgba(255,204,0,0.3); padding:8px 16px; align-items:center; gap:10px; font-size:0.82rem; color:var(--yellow); font-family:'Share Tech Mono',monospace; }
+  #notif-bar.show { display:flex; }
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none; z-index: 0;
-  }
+  .container { position:relative; z-index:1; max-width:960px; margin:0 auto; padding:14px; }
 
-  /* Install banner */
-  #install-bar {
-    display: none;
-    position: sticky; top: 0; z-index: 100;
-    background: linear-gradient(90deg, #0d1520, #111d2e);
-    border-bottom: 2px solid var(--accent2);
-    padding: 10px 16px;
-    align-items: center; gap: 10px;
-    font-size: 0.85rem;
-  }
-  #install-bar.show { display: flex; }
-  #install-bar .ib-text { flex: 1; }
-  #install-bar .ib-text strong { color: var(--accent2); }
-
-  /* Notification banner */
-  #notif-bar {
-    display: none;
-    background: rgba(255,204,0,0.08);
-    border-bottom: 1px solid rgba(255,204,0,0.3);
-    padding: 8px 16px;
-    align-items: center; gap: 10px;
-    font-size: 0.82rem; color: var(--yellow);
-    font-family: 'Share Tech Mono', monospace;
-  }
-  #notif-bar.show { display: flex; }
-
-  .container {
-    position: relative; z-index: 1;
-    max-width: 960px; margin: 0 auto;
-    padding: 14px;
-  }
-
-  /* Header */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-bottom: 2px solid var(--accent);
-    margin-bottom: 14px;
-    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-  }
-
-  .logo {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.2rem; color: var(--accent); letter-spacing: 2px;
-  }
-  .logo span { color: var(--accent2); }
-  .logo small { font-size: 0.6rem; color: var(--dim); margin-left: 6px; }
-
-  .status-bar { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; font-family: 'Share Tech Mono', monospace; flex-wrap: wrap; }
-
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); transition: background 0.3s; flex-shrink: 0; }
-  .dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite; }
-  .dot.warn { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); animation: pulse 1.5s infinite; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:var(--panel); border:1px solid var(--border); border-bottom:2px solid var(--accent); margin-bottom:14px; clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%); flex-wrap:wrap; gap:8px; }
+  .logo { font-family:'Share Tech Mono',monospace; font-size:1.2rem; color:var(--accent); letter-spacing:2px; }
+  .logo span { color:var(--accent2); }
+  .logo small { font-size:0.6rem; color:var(--dim); margin-left:6px; }
+  .status-bar { display:flex; align-items:center; gap:8px; font-size:0.75rem; font-family:'Share Tech Mono',monospace; flex-wrap:wrap; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--dim); transition:background 0.3s; flex-shrink:0; }
+  .dot.active { background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 1.5s infinite; }
+  .dot.warn { background:var(--yellow); box-shadow:0 0 8px var(--yellow); animation:pulse 1.5s infinite; }
   @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-  /* Stats */
-  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 14px; }
-  .stat-box { background: var(--panel); border: 1px solid var(--border); padding: 10px; text-align: center; }
-  .stat-num { font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: var(--accent); line-height: 1; }
-  .stat-label { font-size: 0.6rem; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-top: 2px; }
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+  .stat-box { background:var(--panel); border:1px solid var(--border); padding:10px; text-align:center; }
+  .stat-num { font-family:'Share Tech Mono',monospace; font-size:1.6rem; color:var(--accent); line-height:1; }
+  .stat-label { font-size:0.6rem; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-top:2px; }
 
-  /* Alert zone */
-  #alert-zone {
-    background: var(--panel); border: 2px solid var(--border);
-    padding: 18px; margin-bottom: 14px; text-align: center;
-    min-height: 110px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 10px;
-    transition: all 0.3s;
-  }
-  #alert-zone.firing {
-    border-color: var(--accent2);
-    background: rgba(255,107,53,0.08);
-    animation: alertPulse 0.5s ease-in-out infinite alternate;
-  }
-  @keyframes alertPulse {
-    from { box-shadow: 0 0 10px rgba(255,107,53,0.3); }
-    to   { box-shadow: 0 0 40px rgba(255,107,53,0.8); }
-  }
-  .idle-text { color: var(--dim); font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; }
-  .invite-display {
-    font-family: 'Share Tech Mono', monospace; font-size: 0.88rem;
-    color: var(--accent); word-break: break-all;
-    background: rgba(0,212,255,0.05); padding: 8px 12px;
-    border: 1px solid rgba(0,212,255,0.3); width: 100%; text-align: left;
-  }
+  #alert-zone { background:var(--panel); border:2px solid var(--border); padding:18px; margin-bottom:14px; text-align:center; min-height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; transition:all 0.3s; }
+  #alert-zone.firing { border-color:var(--accent2); background:rgba(255,107,53,0.08); animation:alertPulse 0.5s ease-in-out infinite alternate; }
+  @keyframes alertPulse { from{box-shadow:0 0 10px rgba(255,107,53,0.3)} to{box-shadow:0 0 40px rgba(255,107,53,0.8)} }
+  .idle-text { color:var(--dim); font-family:'Share Tech Mono',monospace; font-size:0.85rem; }
+  .invite-display { font-family:'Share Tech Mono',monospace; font-size:0.88rem; color:var(--accent); word-break:break-all; background:rgba(0,212,255,0.05); padding:8px 12px; border:1px solid rgba(0,212,255,0.3); width:100%; text-align:left; }
 
-  /* Scanner */
-  .scanner { height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: scan 2s linear infinite; margin-bottom: 14px; opacity: 0; transition: opacity 0.3s; }
-  .scanner.active { opacity: 1; }
+  .scanner { height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); animation:scan 2s linear infinite; margin-bottom:14px; opacity:0; transition:opacity 0.3s; }
+  .scanner.active { opacity:1; }
   @keyframes scan { from{background-position:-100% 0} to{background-position:200% 0} }
 
-  /* Manual input */
-  .manual-row { display: flex; gap: 8px; margin-bottom: 14px; }
-  .manual-row input { flex: 1; }
+  .manual-row { display:flex; gap:8px; margin-bottom:14px; }
+  .manual-row input { flex:1; }
 
-  /* Grid */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); padding: 16px; position: relative; }
-  .panel::before { content:''; position:absolute; top:0;left:0; width:3px;height:100%; background:var(--accent); }
-  .panel.orange::before { background: var(--accent2); }
-  .panel.green::before { background: var(--green); }
-  .panel-title { font-size: 0.68rem; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; font-family: 'Share Tech Mono', monospace; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .panel { background:var(--panel); border:1px solid var(--border); padding:16px; position:relative; }
+  .panel::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent); }
+  .panel.orange::before { background:var(--accent2); }
+  .panel.green::before { background:var(--green); }
+  .panel-title { font-size:0.68rem; letter-spacing:3px; color:var(--dim); text-transform:uppercase; margin-bottom:10px; font-family:'Share Tech Mono',monospace; display:flex; justify-content:space-between; align-items:center; }
 
-  label { display: block; font-size: 0.7rem; letter-spacing: 2px; color: var(--dim); margin-bottom: 5px; font-family: 'Share Tech Mono', monospace; }
-  input, select {
-    width: 100%; background: #0a1220; border: 1px solid var(--border);
-    color: var(--text); padding: 9px 10px;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.82rem;
-    outline: none; transition: border-color 0.2s;
-  }
-  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,212,255,0.15); }
-  input::placeholder { color: var(--dim); }
+  label { display:block; font-size:0.7rem; letter-spacing:2px; color:var(--dim); margin-bottom:5px; font-family:'Share Tech Mono',monospace; margin-top:8px; }
+  input { width:100%; background:#0a1220; border:1px solid var(--border); color:var(--text); padding:9px 10px; font-family:'Share Tech Mono',monospace; font-size:0.82rem; outline:none; transition:border-color 0.2s; }
+  input:focus { border-color:var(--accent); box-shadow:0 0 10px rgba(0,212,255,0.15); }
+  input::placeholder { color:var(--dim); }
 
-  .btn {
-    padding: 9px 18px; border: none; cursor: pointer;
-    font-family: 'Rajdhani', sans-serif; font-weight: 700;
-    font-size: 0.88rem; letter-spacing: 2px; text-transform: uppercase;
-    transition: all 0.2s; position: relative; overflow: hidden;
-  }
-  .btn-primary { background: var(--accent); color: #000; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
-  .btn-primary:hover { background: #33ddff; box-shadow: 0 0 16px rgba(0,212,255,0.5); }
-  .btn-danger { background: var(--red); color: #fff; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
-  .btn-green { background: var(--green); color: #000; font-size: 1rem; padding: 12px 24px; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
-  .btn-green:hover { box-shadow: 0 0 24px rgba(0,255,136,0.6); transform: scale(1.02); }
-  .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
-  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  /* Type selector */
+  .type-selector { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+  .type-btn { padding:10px 8px; border:1px solid var(--border); background:#0a1220; color:var(--dim); cursor:pointer; font-family:'Share Tech Mono',monospace; font-size:0.72rem; text-align:center; transition:all 0.2s; line-height:1.6; }
+  .type-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(0,212,255,0.08); }
+  .type-btn.active.is-group { border-color:var(--accent2); color:var(--accent2); background:rgba(255,107,53,0.08); }
 
-  /* Toggle */
-  .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .toggle { width: 40px; height: 20px; background: var(--border); border-radius: 10px; position: relative; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
-  .toggle.on { background: var(--accent); }
-  .toggle::after { content:''; position:absolute; top:3px;left:3px; width:14px;height:14px; background:white; border-radius:50%; transition: left 0.3s; }
-  .toggle.on::after { left: 23px; }
-  .toggle-label { font-size: 0.82rem; letter-spacing: 1px; }
+  .hint { padding:10px 12px; font-size:0.75rem; line-height:1.7; margin-top:8px; border-radius:0; }
+  .hint-channel { background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.2); color:var(--dim); }
+  .hint-group { background:rgba(255,107,53,0.04); border:1px solid rgba(255,107,53,0.2); color:var(--dim); }
+  .hint code { padding:1px 5px; font-family:'Share Tech Mono',monospace; }
+  .hint-channel code { background:rgba(0,212,255,0.1); color:var(--accent); }
+  .hint-group code { background:rgba(255,107,53,0.1); color:var(--accent2); }
 
-  /* Queue */
-  #queue-list { display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; }
-  #queue-list::-webkit-scrollbar { width: 3px; }
-  #queue-list::-webkit-scrollbar-thumb { background: var(--border); }
-  .queue-item { background: #0a1220; border: 1px solid var(--border); padding: 8px 10px; display: flex; align-items: center; gap: 8px; animation: slideIn 0.3s ease; }
+  .btn { padding:9px 18px; border:none; cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:0.88rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.2s; }
+  .btn-primary { background:var(--accent); color:#000; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  .btn-primary:hover { background:#33ddff; box-shadow:0 0 16px rgba(0,212,255,0.5); }
+  .btn-danger { background:var(--red); color:#fff; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  .btn-green { background:var(--green); color:#000; font-size:1rem; padding:12px 24px; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  .btn-green:hover { box-shadow:0 0 24px rgba(0,255,136,0.6); transform:scale(1.02); }
+  .btn-sm { padding:5px 12px; font-size:0.75rem; }
+  .btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+
+  .toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .toggle { width:40px; height:20px; background:var(--border); border-radius:10px; position:relative; cursor:pointer; transition:background 0.3s; flex-shrink:0; }
+  .toggle.on { background:var(--accent); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:14px; height:14px; background:white; border-radius:50%; transition:left 0.3s; }
+  .toggle.on::after { left:23px; }
+  .toggle-label { font-size:0.82rem; }
+
+  #queue-list { display:flex; flex-direction:column; gap:6px; max-height:250px; overflow-y:auto; }
+  #queue-list::-webkit-scrollbar { width:3px; }
+  #queue-list::-webkit-scrollbar-thumb { background:var(--border); }
+  .queue-item { background:#0a1220; border:1px solid var(--border); padding:8px 10px; display:flex; align-items:center; gap:8px; animation:slideIn 0.3s ease; }
   @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-  .queue-item.new { border-color: var(--accent2); }
-  .queue-item.done { opacity: 0.4; border-color: var(--green); }
+  .queue-item.new { border-color:var(--accent2); }
+  .queue-item.done { opacity:0.4; border-color:var(--green); }
   .queue-link { flex:1; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .queue-badge { font-size:0.6rem; padding:2px 6px; border-radius:2px; text-transform:uppercase; letter-spacing:1px; flex-shrink:0; }
   .badge-tg { background:rgba(0,136,255,0.2); color:#0088ff; border:1px solid #004488; }
   .badge-cb { background:rgba(255,204,0,0.15); color:var(--yellow); border:1px solid #665500; }
-  .badge-manual { background:rgba(0,255,136,0.1); color:var(--green); border:1px solid #006633; }
+  .badge-man { background:rgba(0,255,136,0.1); color:var(--green); border:1px solid #006633; }
 
-  /* Feed */
-  #feed { background:#080e18; border:1px solid var(--border); height:240px; overflow-y:auto; padding:8px; font-family:'Share Tech Mono',monospace; font-size:0.75rem; }
+  #feed { background:#080e18; border:1px solid var(--border); height:240px; overflow-y:auto; padding:8px; font-family:'Share Tech Mono',monospace; font-size:0.73rem; }
   #feed::-webkit-scrollbar { width:3px; }
   #feed::-webkit-scrollbar-thumb { background:var(--border); }
   .log-entry { padding:3px 0; border-bottom:1px solid rgba(26,48,80,0.4); display:flex; gap:8px; align-items:flex-start; }
-  .log-time { color:var(--dim); flex-shrink:0; font-size:0.7rem; }
+  .log-time { color:var(--dim); flex-shrink:0; font-size:0.68rem; }
   .log-msg { flex:1; line-height:1.4; }
   .log-entry.hit .log-msg { color:var(--accent2); font-weight:bold; }
   .log-entry.info .log-msg { color:var(--text); }
   .log-entry.system .log-msg { color:var(--accent); }
   .log-entry.joined .log-msg { color:var(--green); }
+  .log-entry.error .log-msg { color:var(--red); }
 
-  /* TG Instructions */
-  .tg-instructions { background:rgba(0,136,255,0.05); border:1px solid rgba(0,136,255,0.2); padding:12px; margin-top:10px; font-size:0.78rem; line-height:1.8; }
-  .tg-instructions code { background:rgba(0,212,255,0.1); padding:1px 5px; color:var(--accent); font-family:'Share Tech Mono',monospace; }
-
-  /* Flash overlay */
   #flash-overlay { position:fixed; inset:0; background:rgba(255,107,53,0.15); pointer-events:none; z-index:999; opacity:0; transition:opacity 0.1s; }
-
-  /* PWA offline badge */
   #offline-badge { display:none; position:fixed; bottom:12px; right:12px; background:var(--red); color:white; padding:6px 12px; font-family:'Share Tech Mono',monospace; font-size:0.75rem; z-index:200; }
 
-  @media (max-width: 640px) {
-    .grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(2,1fr); }
-    header { flex-direction: column; gap: 8px; align-items: flex-start; }
-    .logo { font-size: 1rem; }
+  @media (max-width:640px) {
+    .grid { grid-template-columns:1fr; }
+    .stats-row { grid-template-columns:repeat(2,1fr); }
   }
 </style>
 </head>
@@ -233,24 +138,22 @@
 <div id="flash-overlay"></div>
 <div id="offline-badge">OFFLINE</div>
 
-<!-- Install PWA banner -->
 <div id="install-bar">
-  <span class="ib-text">📲 <strong>Install DiscordHunt</strong> ke homescreen untuk akses lebih cepat!</span>
+  <span style="flex:1">📲 <strong style="color:var(--accent2)">Install DiscordHunt</strong> ke homescreen!</span>
   <button class="btn btn-primary btn-sm" onclick="installPWA()">INSTALL</button>
-  <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--dim)" onclick="document.getElementById('install-bar').classList.remove('show')">✕</button>
+  <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--dim)" onclick="this.parentElement.classList.remove('show')">✕</button>
 </div>
 
-<!-- Notification permission banner -->
 <div id="notif-bar">
-  <span style="flex:1">🔔 Aktifkan notifikasi agar dapat alert bahkan saat app di background</span>
+  <span style="flex:1">🔔 Izinkan notifikasi agar alert muncul saat app di background</span>
   <button class="btn btn-primary btn-sm" onclick="requestNotif()">IZINKAN</button>
-  <button class="btn btn-sm" style="background:transparent;border:1px solid rgba(255,204,0,0.3);color:var(--dim)" onclick="document.getElementById('notif-bar').classList.remove('show')">✕</button>
+  <button class="btn btn-sm" style="background:transparent;border:1px solid rgba(255,204,0,0.3);color:var(--dim)" onclick="this.parentElement.classList.remove('show')">✕</button>
 </div>
 
 <div class="container">
 
   <header>
-    <div class="logo">DISCORD<span>HUNT</span><small>v1.0 PWA</small></div>
+    <div class="logo">DISCORD<span>HUNT</span><small>v1.1 PWA</small></div>
     <div class="status-bar">
       <div class="dot" id="tg-dot"></div>
       <span id="tg-status-text" style="color:var(--dim)">TG OFFLINE</span>
@@ -263,113 +166,91 @@
     </div>
   </header>
 
-  <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-box">
-      <div class="stat-num" id="stat-detected">0</div>
-      <div class="stat-label">Detected</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num" id="stat-queue">0</div>
-      <div class="stat-label">Queue</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num" id="stat-joined" style="color:var(--green)">0</div>
-      <div class="stat-label">Joined</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num" id="stat-uptime" style="color:var(--dim)">00:00</div>
-      <div class="stat-label">Uptime</div>
-    </div>
+    <div class="stat-box"><div class="stat-num" id="stat-detected">0</div><div class="stat-label">Detected</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-queue">0</div><div class="stat-label">Queue</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-joined" style="color:var(--green)">0</div><div class="stat-label">Joined</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-uptime" style="color:var(--dim)">00:00</div><div class="stat-label">Uptime</div></div>
   </div>
 
-  <!-- Alert zone -->
   <div id="alert-zone">
     <div class="idle-text">[ MONITORING — AWAITING DISCORD INVITE LINK ]</div>
   </div>
 
   <div class="scanner" id="scanner"></div>
 
-  <!-- Manual input -->
   <div class="manual-row">
-    <input type="text" id="manual-input" placeholder="Paste Discord link: discord.gg/xxxx">
+    <input type="text" id="manual-input" placeholder="Paste Discord link manual: discord.gg/xxxx">
     <button class="btn btn-primary" onclick="addManual()">+ ADD</button>
   </div>
 
   <div class="grid">
 
-    <!-- Telegram Setup -->
     <div class="panel">
-      <div class="panel-title">⚙ Telegram Monitor</div>
-      <label>BOT TOKEN</label>
-      <input type="password" id="tg-token" placeholder="1234567890:ABCdef..." autocomplete="off">
-      <div style="margin-top:8px">
-        <label>CHAT ID GRUP</label>
-        <input type="text" id="tg-chatid" placeholder="-100123456789 atau @username">
+      <div class="panel-title">⚙ TELEGRAM MONITOR</div>
+
+      <p style="font-size:0.7rem;color:var(--dim);margin-bottom:8px;font-family:'Share Tech Mono',monospace;letter-spacing:1px">PILIH TIPE SUMBER:</p>
+      <div class="type-selector">
+        <div class="type-btn active" id="btn-channel" onclick="selectType('channel')">
+          📢 Channel Publik<br><span style="font-size:0.65rem;opacity:0.7">Pakai @username</span>
+        </div>
+        <div class="type-btn is-group" id="btn-group" onclick="selectType('group')">
+          👥 Grup Pribadi<br><span style="font-size:0.65rem;opacity:0.7">Bot harus Admin</span>
+        </div>
       </div>
+
+      <div class="hint hint-channel" id="hint-channel">
+        ✅ <strong style="color:var(--accent)">Tidak perlu add bot ke channel!</strong><br>
+        Isi username channel saja di bawah.<br>
+        Contoh: <code>@guaremperor</code>
+      </div>
+      <div class="hint hint-group" id="hint-group" style="display:none">
+        ⚠ Bot harus di-add ke grup sebagai <strong style="color:var(--accent2)">Admin</strong> terlebih dahulu.<br>
+        Lalu isi Chat ID (angka negatif).<br>
+        Cara dapat Chat ID: forward pesan ke <code>@userinfobot</code>
+      </div>
+
+      <label id="lbl-chatid">USERNAME CHANNEL</label>
+      <input type="text" id="tg-chatid" placeholder="@guaremperor">
+
+      <label>BOT TOKEN (dari @BotFather)</label>
+      <input type="password" id="tg-token" placeholder="1234567890:AAFxxxx..." autocomplete="off">
+
       <div class="btn-row">
         <button class="btn btn-primary btn-sm" onclick="startTelegram()">▶ START</button>
-        <button class="btn btn-danger btn-sm" onclick="stopTelegram()">■ STOP</button>
+        <button class="btn btn-danger btn-sm" onclick="stopTelegram(false)">■ STOP</button>
         <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--dim)" onclick="saveConfig()">💾 SAVE</button>
-      </div>
-      <div class="tg-instructions">
-        <strong style="color:var(--accent)">SETUP:</strong><br>
-        1. <code>@BotFather</code> → <code>/newbot</code><br>
-        2. Copy token → paste atas<br>
-        3. Add bot ke grup → jadikan <strong>Admin</strong><br>
-        4. Isi Chat ID → klik <strong>START</strong>
       </div>
     </div>
 
-    <!-- Settings -->
     <div class="panel orange">
-      <div class="panel-title">📋 Clipboard & Alert</div>
+      <div class="panel-title">📋 CLIPBOARD & ALERT</div>
 
       <div class="toggle-row">
         <div class="toggle" id="cb-toggle" onclick="toggleClipboard()"></div>
         <span class="toggle-label">Clipboard Monitor</span>
       </div>
-      <p style="font-size:0.75rem;color:var(--dim);margin-bottom:12px;line-height:1.5">
-        Copy link Discord dari mana saja → otomatis masuk queue
-      </p>
+      <p style="font-size:0.74rem;color:var(--dim);margin-bottom:12px;line-height:1.5">Copy link Discord dari mana saja → otomatis masuk queue</p>
 
       <hr style="border-color:var(--border);margin:10px 0">
-      <div class="panel-title">🔔 Alert Options</div>
+      <div class="panel-title">🔔 ALERT OPTIONS</div>
 
-      <div class="toggle-row">
-        <div class="toggle on" id="sound-toggle" onclick="toggleSound()"></div>
-        <span class="toggle-label">Sound Alarm</span>
-      </div>
-      <div class="toggle-row">
-        <div class="toggle on" id="flash-toggle" onclick="toggleFlash()"></div>
-        <span class="toggle-label">Screen Flash</span>
-      </div>
-      <div class="toggle-row">
-        <div class="toggle on" id="vibrate-toggle" onclick="toggleVibrate()"></div>
-        <span class="toggle-label">Vibrate (mobile)</span>
-      </div>
-      <div class="toggle-row">
-        <div class="toggle on" id="autotab-toggle" onclick="toggleAutoTab()"></div>
-        <span class="toggle-label">Auto-open tab</span>
-      </div>
+      <div class="toggle-row"><div class="toggle on" id="sound-toggle" onclick="toggleOpt('sound')"></div><span class="toggle-label">Sound Alarm</span></div>
+      <div class="toggle-row"><div class="toggle on" id="flash-toggle" onclick="toggleOpt('flash')"></div><span class="toggle-label">Screen Flash</span></div>
+      <div class="toggle-row"><div class="toggle on" id="vibrate-toggle" onclick="toggleOpt('vibrate')"></div><span class="toggle-label">Vibrate (mobile)</span></div>
+      <div class="toggle-row"><div class="toggle on" id="autotab-toggle" onclick="toggleOpt('autotab')"></div><span class="toggle-label">Auto-open tab</span></div>
     </div>
 
   </div>
 
-  <!-- Queue + Log -->
   <div class="grid">
     <div class="panel green">
-      <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center">
+      <div class="panel-title">
         <span>📥 INVITE QUEUE</span>
         <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer" onclick="clearQueue()">CLEAR</button>
       </div>
-      <div id="queue-list">
-        <div style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:0.78rem;text-align:center;padding:16px">
-          Queue kosong...
-        </div>
-      </div>
+      <div id="queue-list"><div style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:0.78rem;text-align:center;padding:16px">Queue kosong...</div></div>
     </div>
-
     <div class="panel">
       <div class="panel-title">📡 ACTIVITY LOG</div>
       <div id="feed"></div>
@@ -379,328 +260,295 @@
 </div>
 
 <script>
-// ─── PWA: Service Worker ──────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
-    console.log('SW registered:', reg.scope);
-  }).catch(err => console.warn('SW error:', err));
-}
+// ── PWA ──────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-// ─── PWA: Install prompt ──────────────────────────────────────
 let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('install-bar').classList.add('show');
-});
-
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; document.getElementById('install-bar').classList.add('show'); });
 async function installPWA() {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    log('✅ App berhasil diinstall!', 'system');
-    document.getElementById('install-bar').classList.remove('show');
-  }
-  deferredPrompt = null;
+  const {outcome} = await deferredPrompt.userChoice;
+  if (outcome==='accepted') document.getElementById('install-bar').classList.remove('show');
+  deferredPrompt=null;
 }
 
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-bar').classList.remove('show');
-  log('📲 PWA installed — bisa buka dari homescreen sekarang!', 'system');
-});
-
-// ─── Notifications ────────────────────────────────────────────
+// ── Notifications ─────────────────────────────────────────────
 async function requestNotif() {
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    document.getElementById('notif-bar').classList.remove('show');
+  document.getElementById('notif-bar').classList.remove('show');
+  const p = await Notification.requestPermission();
+  if (p==='granted') {
     document.getElementById('notif-dot').classList.add('active');
-    document.getElementById('notif-status').textContent = 'NOTIF ON';
-    document.getElementById('notif-status').style.color = 'var(--green)';
-    log('🔔 Notifikasi aktif!', 'system');
-  } else {
-    log('⚠ Notifikasi ditolak — alert hanya muncul saat app terbuka', 'system');
+    document.getElementById('notif-status').textContent='NOTIF ON';
+    document.getElementById('notif-status').style.color='var(--green)';
+    log('🔔 Notifikasi aktif!','system');
   }
 }
-
-function sendNotification(title, body, link) {
-  if (Notification.permission === 'granted') {
-    const n = new Notification(title, {
-      body, icon: './icon-192.png',
-      badge: './icon-192.png',
-      tag: 'discord-invite',
-      renotify: true,
-      requireInteraction: true,
-      vibrate: [200, 100, 200, 100, 200]
-    });
-    n.onclick = () => { window.focus(); if (link) window.open(link, '_blank'); n.close(); };
-  }
+function sendNotif(title,body,link) {
+  if (Notification.permission!=='granted') return;
+  const n=new Notification(title,{body,icon:'./icon-192.png',tag:'discord-invite',renotify:true,requireInteraction:true});
+  n.onclick=()=>{window.focus();if(link)window.open(link,'_blank');n.close();};
 }
 
-// ─── Offline detection ────────────────────────────────────────
-window.addEventListener('online',  () => { document.getElementById('offline-badge').style.display = 'none'; log('🌐 Koneksi kembali', 'system'); });
-window.addEventListener('offline', () => { document.getElementById('offline-badge').style.display = 'block'; log('⚠ OFFLINE — Telegram polling berhenti', 'system'); });
+// ── Online/Offline ────────────────────────────────────────────
+window.addEventListener('online',  ()=>{document.getElementById('offline-badge').style.display='none'; log('🌐 Online kembali','system');});
+window.addEventListener('offline', ()=>{document.getElementById('offline-badge').style.display='block'; log('⚠ OFFLINE','system');});
 
-// ─── Config persistence ───────────────────────────────────────
+// ── Type selector ─────────────────────────────────────────────
+let sourceType = 'channel';
+function selectType(t) {
+  sourceType = t;
+  const isChannel = t==='channel';
+  document.getElementById('btn-channel').classList.toggle('active', isChannel);
+  document.getElementById('btn-group').classList.toggle('active', !isChannel);
+  document.getElementById('hint-channel').style.display = isChannel?'block':'none';
+  document.getElementById('hint-group').style.display   = isChannel?'none':'block';
+  document.getElementById('lbl-chatid').textContent     = isChannel?'USERNAME CHANNEL':'CHAT ID GRUP';
+  document.getElementById('tg-chatid').placeholder      = isChannel?'@guaremperor':'-1001234567890';
+}
+
+// ── Config ────────────────────────────────────────────────────
 function saveConfig() {
-  const cfg = {
-    token: document.getElementById('tg-token').value,
-    chatid: document.getElementById('tg-chatid').value
-  };
-  localStorage.setItem('dh_config', JSON.stringify(cfg));
-  log('💾 Config tersimpan', 'system');
+  localStorage.setItem('dh_cfg', JSON.stringify({
+    token:  document.getElementById('tg-token').value,
+    chatid: document.getElementById('tg-chatid').value,
+    type:   sourceType
+  }));
+  log('💾 Config tersimpan — klik START untuk mulai','system');
 }
-
 function loadConfig() {
   try {
-    const cfg = JSON.parse(localStorage.getItem('dh_config') || '{}');
-    if (cfg.token) document.getElementById('tg-token').value = cfg.token;
-    if (cfg.chatid) document.getElementById('tg-chatid').value = cfg.chatid;
-  } catch(e) {}
+    const c=JSON.parse(localStorage.getItem('dh_cfg')||'{}');
+    if(c.token)  document.getElementById('tg-token').value=c.token;
+    if(c.chatid) document.getElementById('tg-chatid').value=c.chatid;
+    if(c.type)   selectType(c.type);
+  } catch(e){}
+  // ⚠ TIDAK auto-start — user harus klik START manual
 }
 
-// ─── State ───────────────────────────────────────────────────
-let tgPolling = null, tgOffset = 0;
-let cbInterval = null, cbLastValue = '';
-let soundEnabled = true, flashEnabled = true, vibrateEnabled = true, autoTabEnabled = true, cbEnabled = false;
-let queue = [];
-let stats = { detected: 0, queue: 0, joined: 0 };
-let startTime = Date.now();
+// ── State ─────────────────────────────────────────────────────
+let tgPolling=null, tgOffset=0, conflictRetry=0;
+let cbInterval=null, cbLastValue='';
+let opts={sound:true,flash:true,vibrate:true,autotab:true};
+let cbEnabled=false, queue=[], stats={detected:0,joined:0};
+let startTime=Date.now();
 
-setInterval(() => {
-  const e = Math.floor((Date.now() - startTime) / 1000);
-  const m = String(Math.floor(e/60)).padStart(2,'0');
-  const s = String(e%60).padStart(2,'0');
-  document.getElementById('stat-uptime').textContent = m+':'+s;
-}, 1000);
+setInterval(()=>{
+  const e=Math.floor((Date.now()-startTime)/1000);
+  document.getElementById('stat-uptime').textContent=String(Math.floor(e/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0');
+},1000);
 
-// ─── Discord regex ────────────────────────────────────────────
-const DISCORD_RE = /(?:https?:\/\/)?(?:www\.)?discord(?:\.gg|app\.com\/invite|\.com\/invite)\/([a-zA-Z0-9\-_]+)/gi;
+const DLINK=/(?:https?:\/\/)?(?:www\.)?discord(?:\.gg|app\.com\/invite|\.com\/invite)\/([a-zA-Z0-9\-_]+)/gi;
+function extractLinks(t){const l=[];let m;DLINK.lastIndex=0;while((m=DLINK.exec(t))!==null)l.push('https://discord.gg/'+m[1]);return[...new Set(l)];}
 
-function extractLinks(text) {
-  const links = [];
-  let m; DISCORD_RE.lastIndex = 0;
-  while ((m = DISCORD_RE.exec(text)) !== null) links.push('https://discord.gg/' + m[1]);
-  return [...new Set(links)];
+// ── Log ───────────────────────────────────────────────────────
+function log(msg,type='info'){
+  const feed=document.getElementById('feed');
+  const d=document.createElement('div');
+  d.className='log-entry '+type;
+  d.innerHTML=`<span class="log-time">${new Date().toTimeString().slice(0,8)}</span><span class="log-msg">${msg}</span>`;
+  feed.prepend(d);
+  if(feed.children.length>150)feed.lastChild.remove();
 }
 
-// ─── Log ─────────────────────────────────────────────────────
-function log(msg, type='info') {
-  const feed = document.getElementById('feed');
-  const time = new Date().toTimeString().slice(0,8);
-  const div = document.createElement('div');
-  div.className = `log-entry ${type}`;
-  div.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span>`;
-  feed.prepend(div);
-  if (feed.children.length > 200) feed.lastChild.remove();
-}
-
-// ─── Alert ───────────────────────────────────────────────────
-function fireAlert(link, source) {
-  const zone = document.getElementById('alert-zone');
-  zone.classList.add('firing');
-  zone.innerHTML = `
-    <div style="color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:0.8rem;letter-spacing:2px">🚨 INVITE DETECTED — ${source.toUpperCase()}</div>
+// ── Alert ─────────────────────────────────────────────────────
+function fireAlert(link,source){
+  const z=document.getElementById('alert-zone');
+  z.classList.add('firing');
+  z.innerHTML=`
+    <div style="color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:0.78rem;letter-spacing:2px">🚨 INVITE DETECTED — ${source.toUpperCase()}</div>
     <div class="invite-display">${link}</div>
     <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center">
       <button class="btn btn-green" onclick="joinNow('${link}')">⚡ JOIN NOW</button>
       <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer" onclick="dismissAlert()">DISMISS</button>
     </div>
-    <div style="font-size:0.7rem;color:var(--dim);font-family:'Share Tech Mono',monospace">Source: ${source} • ${new Date().toLocaleTimeString()}</div>
-  `;
-  if (soundEnabled) playAlarm();
-  if (flashEnabled) doFlash();
-  if (vibrateEnabled && navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
-  if (autoTabEnabled) setTimeout(() => window.open(link, '_blank'), 400);
-  sendNotification('🚨 Discord Invite Found!', `${source}: ${link}`, link);
-  log(`🎯 INVITE [${source}]: ${link}`, 'hit');
+    <div style="font-size:0.68rem;color:var(--dim);font-family:'Share Tech Mono',monospace">Source: ${source} • ${new Date().toLocaleTimeString()}</div>`;
+  if(opts.sound)playAlarm();
+  if(opts.flash)doFlash();
+  if(opts.vibrate&&navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
+  if(opts.autotab)setTimeout(()=>window.open(link,'_blank'),400);
+  sendNotif('🚨 Discord Invite Found!',`${source}: ${link}`,link);
+  log(`🎯 INVITE [${source}]: ${link}`,'hit');
 }
-
-function dismissAlert() {
-  const zone = document.getElementById('alert-zone');
-  zone.classList.remove('firing');
-  zone.innerHTML = `<div class="idle-text">[ MONITORING — AWAITING DISCORD INVITE LINK ]</div>`;
+function dismissAlert(){
+  const z=document.getElementById('alert-zone');
+  z.classList.remove('firing');
+  z.innerHTML='<div class="idle-text">[ MONITORING — AWAITING DISCORD INVITE LINK ]</div>';
 }
-
-function joinNow(link) {
+function joinNow(link){
   stats.joined++;
-  document.getElementById('stat-joined').textContent = stats.joined;
-  log(`✅ JOINED: ${link}`, 'joined');
-  window.open(link, '_blank');
-  queue = queue.map(q => q.link === link ? {...q, done:true} : q);
-  renderQueue();
-  dismissAlert();
+  document.getElementById('stat-joined').textContent=stats.joined;
+  log(`✅ JOINED: ${link}`,'joined');
+  window.open(link,'_blank');
+  queue=queue.map(q=>q.link===link?{...q,done:true}:q);
+  renderQueue();dismissAlert();
 }
 
-// ─── Sound ───────────────────────────────────────────────────
-function playAlarm() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.15, 0.30].forEach(t => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(880, ctx.currentTime + t);
-      osc.frequency.setValueAtTime(1200, ctx.currentTime + t + 0.07);
-      gain.gain.setValueAtTime(0.5, ctx.currentTime + t);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.14);
-      osc.start(ctx.currentTime + t);
-      osc.stop(ctx.currentTime + t + 0.15);
+// ── Sound/Flash ───────────────────────────────────────────────
+function playAlarm(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.15,0.30].forEach(t=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.setValueAtTime(880,ctx.currentTime+t);
+      o.frequency.setValueAtTime(1200,ctx.currentTime+t+0.07);
+      g.gain.setValueAtTime(0.5,ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.14);
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.15);
     });
-  } catch(e) {}
+  }catch(e){}
+}
+function doFlash(){
+  const o=document.getElementById('flash-overlay');let c=0;
+  const i=setInterval(()=>{o.style.opacity=c%2===0?'1':'0';if(++c>6){clearInterval(i);o.style.opacity='0';}},100);
 }
 
-function doFlash() {
-  const o = document.getElementById('flash-overlay');
-  let c = 0;
-  const i = setInterval(() => {
-    o.style.opacity = c%2===0 ? '1' : '0';
-    if (++c > 6) { clearInterval(i); o.style.opacity='0'; }
-  }, 100);
-}
-
-// ─── Queue ───────────────────────────────────────────────────
-function addToQueue(link, source) {
-  if (queue.find(q => q.link === link)) return;
+// ── Queue ─────────────────────────────────────────────────────
+function addToQueue(link,source){
+  if(queue.find(q=>q.link===link))return;
   stats.detected++;
-  document.getElementById('stat-detected').textContent = stats.detected;
-  queue.unshift({ link, source, time: new Date().toLocaleTimeString(), done: false });
-  renderQueue();
-  fireAlert(link, source);
+  document.getElementById('stat-detected').textContent=stats.detected;
+  queue.unshift({link,source,time:new Date().toLocaleTimeString(),done:false});
+  renderQueue();fireAlert(link,source);
 }
-
-function renderQueue() {
-  const el = document.getElementById('queue-list');
-  if (!queue.length) {
-    el.innerHTML = `<div style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:0.78rem;text-align:center;padding:16px">Queue kosong...</div>`;
-    document.getElementById('stat-queue').textContent = 0;
-    return;
-  }
-  document.getElementById('stat-queue').textContent = queue.filter(q => !q.done).length;
-  el.innerHTML = queue.map(q => {
-    const badgeClass = q.source === 'Telegram' ? 'tg' : q.source === 'Clipboard' ? 'cb' : 'manual';
-    return `
-      <div class="queue-item ${q.done?'done':'new'}">
-        <span class="queue-badge badge-${badgeClass}">${q.source.substring(0,4)}</span>
-        <span class="queue-link" title="${q.link}">${q.link}</span>
-        <span style="font-size:0.65rem;color:var(--dim);font-family:'Share Tech Mono',monospace;flex-shrink:0">${q.time}</span>
-        ${!q.done ? `<button class="btn btn-green btn-sm" onclick="joinNow('${q.link}')">JOIN</button>` : '<span style="color:var(--green);font-size:0.72rem">✓</span>'}
-      </div>`;
+function renderQueue(){
+  const el=document.getElementById('queue-list');
+  document.getElementById('stat-queue').textContent=queue.filter(q=>!q.done).length;
+  if(!queue.length){el.innerHTML='<div style="color:var(--dim);font-family:\'Share Tech Mono\',monospace;font-size:0.78rem;text-align:center;padding:16px">Queue kosong...</div>';return;}
+  el.innerHTML=queue.map(q=>{
+    const bc=q.source==='Telegram'?'tg':q.source==='Clipboard'?'cb':'man';
+    return`<div class="queue-item ${q.done?'done':'new'}">
+      <span class="queue-badge badge-${bc}">${q.source.substring(0,4)}</span>
+      <span class="queue-link" title="${q.link}">${q.link}</span>
+      <span style="font-size:0.62rem;color:var(--dim);font-family:'Share Tech Mono',monospace;flex-shrink:0">${q.time}</span>
+      ${!q.done?`<button class="btn btn-green btn-sm" onclick="joinNow('${q.link}')">JOIN</button>`:'<span style="color:var(--green);font-size:0.72rem">✓</span>'}
+    </div>`;
   }).join('');
 }
-
-function clearQueue() { queue = []; renderQueue(); }
-
-// ─── Manual ──────────────────────────────────────────────────
-function addManual() {
-  const input = document.getElementById('manual-input');
-  const links = extractLinks(input.value.trim());
-  if (!links.length) { log('⚠ Tidak ada Discord link valid', 'system'); return; }
-  links.forEach(l => addToQueue(l, 'Manual'));
-  input.value = '';
+function clearQueue(){queue=[];renderQueue();}
+function addManual(){
+  const inp=document.getElementById('manual-input');
+  const links=extractLinks(inp.value.trim());
+  if(!links.length){log('⚠ Tidak ada Discord link valid','system');return;}
+  links.forEach(l=>addToQueue(l,'Manual'));
+  inp.value='';
 }
-document.getElementById('manual-input').addEventListener('keydown', e => { if (e.key==='Enter') addManual(); });
+document.getElementById('manual-input').addEventListener('keydown',e=>{if(e.key==='Enter')addManual();});
 
-// ─── Telegram polling ─────────────────────────────────────────
-async function startTelegram() {
-  const token = document.getElementById('tg-token').value.trim();
+// ── Telegram ──────────────────────────────────────────────────
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function startTelegram(){
+  const token  = document.getElementById('tg-token').value.trim();
   const chatId = document.getElementById('tg-chatid').value.trim();
-  if (!token) { log('⚠ Masukkan Bot Token!', 'system'); return; }
-  stopTelegram();
-  log('▶ Memulai Telegram monitor...', 'system');
-  document.getElementById('tg-dot').classList.add('active');
-  document.getElementById('tg-status-text').style.color = 'var(--green)';
-  document.getElementById('tg-status-text').textContent = 'TG LIVE';
-  document.getElementById('scanner').classList.add('active');
+  if(!token) {log('⚠ Isi Bot Token dulu!','system');return;}
+  if(!chatId){log('⚠ Isi '+document.getElementById('lbl-chatid').textContent+' dulu!','system');return;}
+
+  stopTelegram(true); // hentikan instance lama tanpa log
+  await sleep(2000);  // tunggu 2 detik agar tidak conflict
+
+  log('▶ Menghubungkan ke Telegram...','system');
 
   try {
-    const r = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=1&offset=-1`);
-    const d = await r.json();
-    if (d.ok && d.result.length) tgOffset = d.result[d.result.length-1].update_id + 1;
-  } catch(e) {}
+    const r=await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=1&offset=-1`);
+    const txt=await r.text();
+    const d=JSON.parse(txt);
+    if(!d.ok){log(`❌ Token tidak valid: ${d.description}`,'error');return;}
+    if(d.result.length) tgOffset=d.result[d.result.length-1].update_id+1;
+  } catch(e){log('❌ Gagal konek Telegram API','error');return;}
 
-  tgPolling = setInterval(async () => {
-    if (!navigator.onLine) return;
-    try {
-      const r = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${tgOffset}&limit=20&timeout=5`);
-      const d = await r.json();
-      if (!d.ok) { log('❌ TG: ' + (d.description||'Error'), 'system'); return; }
-      for (const upd of d.result) {
-        tgOffset = upd.update_id + 1;
-        const msg = upd.message || upd.channel_post || upd.edited_message || upd.edited_channel_post;
-        if (!msg) continue;
-        if (chatId) {
-          const cid = String(msg.chat.id);
-          const cuname = (msg.chat.username||'');
-          if (cid !== chatId && cuname !== chatId.replace('@','') && chatId !== '') continue;
-        }
-        const text = [msg.text, msg.caption, ...(msg.entities||[]).map(e=>e.url||''), ...(msg.caption_entities||[]).map(e=>e.url||'')].filter(Boolean).join(' ');
-        const links = extractLinks(text);
-        if (links.length) {
-          log(`📨 [TG] ${(msg.chat.title||msg.chat.username||'msg').substring(0,25)}`, 'info');
-          links.forEach(l => addToQueue(l, 'Telegram'));
+  document.getElementById('tg-dot').classList.add('active');
+  document.getElementById('tg-status-text').style.color='var(--green)';
+  document.getElementById('tg-status-text').textContent='TG LIVE';
+  document.getElementById('scanner').classList.add('active');
+  conflictRetry=0;
+
+  tgPolling=setInterval(async()=>{
+    if(!navigator.onLine)return;
+    try{
+      const r=await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${tgOffset}&limit=20&timeout=3`);
+      let d;
+      try{d=JSON.parse(await r.text());}catch(e){return;} // skip bad response
+
+      // Conflict → stop & retry otomatis
+      if(!d.ok && d.error_code===409){
+        conflictRetry++;
+        log(`⚠ Conflict (${conflictRetry}) — menunggu 5 detik...`,'system');
+        stopTelegram(true);
+        if(conflictRetry<=3){await sleep(5000);startTelegram();}
+        else{log('❌ Masih conflict — pastikan tidak ada tab/app lain yang pakai bot yang sama','error');}
+        return;
+      }
+      if(!d.ok){log(`❌ TG: ${d.description}`,'error');return;}
+      conflictRetry=0;
+
+      for(const upd of d.result){
+        tgOffset=upd.update_id+1;
+        const msg=upd.message||upd.channel_post||upd.edited_message||upd.edited_channel_post;
+        if(!msg)continue;
+
+        // Filter chat sesuai input
+        const cid=String(msg.chat.id);
+        const uname=(msg.chat.username||'').toLowerCase();
+        const target=chatId.replace('@','').toLowerCase();
+        if(cid!==chatId && uname!==target)continue;
+
+        const parts=[msg.text,msg.caption,...(msg.entities||[]).map(e=>e.url||''),...(msg.caption_entities||[]).map(e=>e.url||'')].filter(Boolean);
+        const links=extractLinks(parts.join(' '));
+        if(links.length){
+          log(`📨 [TG] ${(msg.chat.title||msg.chat.username||'channel').substring(0,25)}`,'info');
+          links.forEach(l=>addToQueue(l,'Telegram'));
         }
       }
-    } catch(e) { log('⚠ TG poll: ' + e.message, 'system'); }
-  }, 2000);
+    }catch(e){} // network error, abaikan
+  },2000);
 
-  log('✅ Telegram aktif — polling setiap 2 detik', 'system');
+  log(`✅ Monitoring ${sourceType==='channel'?'channel':'grup'} ${chatId}  — polling 2 detik`,'system');
 }
 
-function stopTelegram() {
-  if (tgPolling) { clearInterval(tgPolling); tgPolling = null; }
+function stopTelegram(silent=false){
+  if(tgPolling){clearInterval(tgPolling);tgPolling=null;}
   document.getElementById('tg-dot').classList.remove('active');
-  document.getElementById('tg-status-text').style.color = 'var(--dim)';
-  document.getElementById('tg-status-text').textContent = 'TG OFFLINE';
+  document.getElementById('tg-status-text').style.color='var(--dim)';
+  document.getElementById('tg-status-text').textContent='TG OFFLINE';
   document.getElementById('scanner').classList.remove('active');
+  if(!silent)log('■ Telegram dihentikan','system');
 }
 
-// ─── Clipboard ────────────────────────────────────────────────
-function toggleClipboard() {
-  cbEnabled = !cbEnabled;
-  document.getElementById('cb-toggle').classList.toggle('on', cbEnabled);
-  document.getElementById('cb-dot').classList.toggle('warn', cbEnabled);
-  document.getElementById('cb-status-text').textContent = cbEnabled ? 'CLIP ON' : 'CLIP OFF';
-  document.getElementById('cb-status-text').style.color = cbEnabled ? 'var(--yellow)' : 'var(--dim)';
-  if (cbEnabled) {
-    log('📋 Clipboard monitor aktif', 'system');
-    cbInterval = setInterval(async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text !== cbLastValue) {
-          cbLastValue = text;
-          const links = extractLinks(text);
-          if (links.length) links.forEach(l => addToQueue(l, 'Clipboard'));
-        }
-      } catch(e) {}
-    }, 500);
-  } else {
-    if (cbInterval) { clearInterval(cbInterval); cbInterval = null; }
-    log('■ Clipboard monitor off', 'system');
-  }
+// ── Clipboard ─────────────────────────────────────────────────
+function toggleClipboard(){
+  cbEnabled=!cbEnabled;
+  document.getElementById('cb-toggle').classList.toggle('on',cbEnabled);
+  document.getElementById('cb-dot').classList.toggle('warn',cbEnabled);
+  document.getElementById('cb-status-text').textContent=cbEnabled?'CLIP ON':'CLIP OFF';
+  document.getElementById('cb-status-text').style.color=cbEnabled?'var(--yellow)':'var(--dim)';
+  if(cbEnabled){
+    log('📋 Clipboard aktif','system');
+    cbInterval=setInterval(async()=>{
+      try{const t=await navigator.clipboard.readText();if(t!==cbLastValue){cbLastValue=t;extractLinks(t).forEach(l=>addToQueue(l,'Clipboard'));}}catch(e){}
+    },500);
+  }else{if(cbInterval){clearInterval(cbInterval);cbInterval=null;}log('■ Clipboard off','system');}
 }
 
-function toggleSound()   { soundEnabled   = !soundEnabled;   document.getElementById('sound-toggle').classList.toggle('on', soundEnabled); }
-function toggleFlash()   { flashEnabled   = !flashEnabled;   document.getElementById('flash-toggle').classList.toggle('on', flashEnabled); }
-function toggleVibrate() { vibrateEnabled = !vibrateEnabled; document.getElementById('vibrate-toggle').classList.toggle('on', vibrateEnabled); }
-function toggleAutoTab() { autoTabEnabled = !autoTabEnabled; document.getElementById('autotab-toggle').classList.toggle('on', autoTabEnabled); log(`🗂 Auto-tab: ${autoTabEnabled?'ON':'OFF'}`, 'system'); }
+function toggleOpt(key){
+  opts[key]=!opts[key];
+  document.getElementById(`${key}-toggle`).classList.toggle('on',opts[key]);
+}
 
-// ─── Init ────────────────────────────────────────────────────
-loadConfig();
+// ── Init ──────────────────────────────────────────────────────
+loadConfig(); // load config tapi TIDAK auto-start polling
 
-// Check notif permission on load
-if (Notification.permission === 'granted') {
+if(Notification.permission==='granted'){
   document.getElementById('notif-dot').classList.add('active');
-  document.getElementById('notif-status').textContent = 'NOTIF ON';
-  document.getElementById('notif-status').style.color = 'var(--green)';
-} else if (Notification.permission !== 'denied') {
-  setTimeout(() => document.getElementById('notif-bar').classList.add('show'), 2000);
+  document.getElementById('notif-status').textContent='NOTIF ON';
+  document.getElementById('notif-status').style.color='var(--green)';
+}else if(Notification.permission!=='denied'){
+  setTimeout(()=>document.getElementById('notif-bar').classList.add('show'),2000);
 }
 
-log('🚀 DiscordHunt PWA ready', 'system');
-log('💾 Klik SAVE setelah isi token agar tersimpan', 'system');
-log('📲 Install ke homescreen untuk akses instant', 'system');
+log('🚀 DiscordHunt v1.1 siap','system');
+log('▶ Pilih tipe sumber → isi form → klik START','system');
 </script>
 </body>
 </html>
