@@ -1,0 +1,33 @@
+{
+  "name": "DiscordHunt — WL Sniper",
+  "short_name": "DiscordHunt",
+  "description": "Discord Invite Link Monitor for NFT/Crypto Whitelist Hunting",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060a0f",
+  "theme_color": "#00d4ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Monitor Aktif",
+      "short_name": "Monitor",
+      "description": "Buka DiscordHunt dan mulai monitor",
+      "url": "./index.html"
+    }
+  ]
+}
