@@ -171,7 +171,7 @@
 <div class="container">
 
   <header>
-    <div class="logo">DISCORD<span>HUNT</span><small>v1.2 PWA</small></div>
+    <div class="logo">DISCORD<span>HUNT</span><small>v1.4 PWA</small></div>
     <div class="status-bar">
       <div class="dot" id="tg-dot"></div>
       <span id="tg-status-text" style="color:var(--dim)">TG OFFLINE</span>
@@ -377,9 +377,43 @@ function loadConfig() {
 // ══════════════════════════════════════════════
 // State
 // ══════════════════════════════════════════════
+// BroadcastChannel — lock agar hanya 1 instance polling jalan
+// Ini fix conflict akibat SW lama vs baru overlap saat update deploy
+const BC = ('BroadcastChannel' in window) ? new BroadcastChannel('dh_lock') : null;
+let isLeader = false; // instance ini yang boleh polling?
+
+function claimLeader() {
+  isLeader = true;
+  if (BC) BC.postMessage({ type: 'claim' }); // beritahu instance lain
+}
+
+function releaseLeader() {
+  isLeader = false;
+}
+
+if (BC) {
+  BC.onmessage = (e) => {
+    if (e.data.type === 'claim') {
+      // Ada instance lain yang klaim jadi leader — kita mundur
+      if (isLeader && tgPolling) {
+        isLeader = false;
+        _stopPolling();
+        log('⚠ Instance lain aktif — polling di sini dihentikan', 'system');
+        stopTelegram(false);
+      }
+    }
+    if (e.data.type === 'ping') {
+      // Ada instance baru tanya siapa leader
+      if (isLeader) BC.postMessage({ type: 'claim' });
+    }
+  };
+  // Cek dulu apakah ada instance lain yang sudah jalan
+  BC.postMessage({ type: 'ping' });
+}
+
 let tgPolling    = null;
 let tgOffset     = 0;
-let tgRetryTimer = null;   // FIX: gunakan setTimeout bukan re-call dari dalam interval
+let tgRetryTimer = null;
 let retryCount   = 0;
 let cbInterval   = null;
 let cbLastValue  = '';
@@ -586,6 +620,7 @@ async function startTelegram() {
   document.getElementById('tg-status-text').textContent = 'TG LIVE';
   document.getElementById('scanner').classList.add('active');
   retryCount = 0;
+  claimLeader(); // broadcast ke instance lain bahwa kita yang aktif
 
   // Mulai polling loop
   tgPolling = setInterval(async () => {
@@ -656,6 +691,7 @@ function _stopPolling() {
 // Public stop — hentikan + update UI + log
 function stopTelegram(silent = false) {
   _stopPolling();
+  releaseLeader();
   retryCount = 0;
   document.getElementById('tg-dot').classList.remove('active');
   document.getElementById('tg-status-text').style.color = 'var(--dim)';
@@ -667,28 +703,136 @@ function stopTelegram(silent = false) {
 // ══════════════════════════════════════════════
 // Clipboard Monitor
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// Clipboard Monitor
+// Di mobile: Clipboard API hanya bisa saat app foreground.
+// Toggle ON = siap deteksi saat app aktif di layar.
+// Toggle OFF = tidak cek clipboard sama sekali.
+// ══════════════════════════════════════════════
 function toggleClipboard() {
   cbEnabled = !cbEnabled;
   document.getElementById('cb-toggle').classList.toggle('on', cbEnabled);
   document.getElementById('cb-dot').classList.toggle('warn', cbEnabled);
-  document.getElementById('cb-status-text').textContent  = cbEnabled ? 'CLIP ON'  : 'CLIP OFF';
-  document.getElementById('cb-status-text').style.color  = cbEnabled ? 'var(--yellow)' : 'var(--dim)';
+  document.getElementById('cb-status-text').textContent = cbEnabled ? 'CLIP ON'  : 'CLIP OFF';
+  document.getElementById('cb-status-text').style.color = cbEnabled ? 'var(--yellow)' : 'var(--dim)';
 
   if (cbEnabled) {
-    log('📋 Clipboard monitor aktif', 'system');
-    cbInterval = setInterval(async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text !== cbLastValue) {
-          cbLastValue = text;
-          extractLinks(text).forEach(l => addToQueue(l, 'Clipboard'));
-        }
-      } catch(e) { /* permission denied atau app di background — normal */ }
-    }, 500);
+    log('📋 Clipboard monitor aktif — copy link Discord kapanpun', 'system');
+    startClipboardInterval();
   } else {
-    if (cbInterval) { clearInterval(cbInterval); cbInterval = null; }
+    stopClipboardInterval();
     log('■ Clipboard monitor off', 'system');
   }
+}
+
+function startClipboardInterval() {
+  stopClipboardInterval();
+  cbInterval = setInterval(async () => {
+    if (!cbEnabled || document.hidden) return; // skip saat app di background
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && text !== cbLastValue) {
+        cbLastValue = text;
+        const links = extractLinks(text);
+        if (links.length) {
+          links.forEach(l => addToQueue(l, 'Clipboard'));
+        }
+      }
+    } catch(e) {
+      // Clipboard permission denied atau browser block — diam saja
+    }
+  }, 600);
+}
+
+function stopClipboardInterval() {
+  if (cbInterval) { clearInterval(cbInterval); cbInterval = null; }
+}
+
+// ══════════════════════════════════════════════
+// Page Lifecycle — handle minimize/restore di Android
+// FIX: saat app di-minimize, browser suspend JS.
+// Saat dibuka lagi (visibilitychange = visible), interval
+// lama mungkin masih "hidup" sebentar lalu conflict.
+// Solusi: pause polling saat hidden, resume saat visible.
+// ══════════════════════════════════════════════
+let tgWasRunning = false;
+
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden) {
+    // App di-minimize / pindah tab
+    // Hentikan polling sementara agar tidak conflict saat resume
+    if (tgPolling) {
+      tgWasRunning = true;
+      _stopPolling();
+      // Tidak update UI — status tetap "TG LIVE" di header
+    }
+  } else {
+    // App kembali ke foreground
+    if (tgWasRunning) {
+      tgWasRunning = false;
+      // Tunggu sebentar agar Telegram API bebas dari sesi lama
+      await sleep(1200);
+      // Hanya restart jika user tidak manual stop
+      const statusText = document.getElementById('tg-status-text').textContent;
+      if (statusText === 'TG LIVE') {
+        log('▶ App kembali aktif — melanjutkan monitoring...', 'system');
+        // Ambil ulang token & chatId dari field (sudah tersimpan)
+        const token  = document.getElementById('tg-token').value.trim();
+        const chatId = document.getElementById('tg-chatid').value.trim();
+        if (token && chatId) _resumePolling(token, chatId);
+      }
+    }
+  }
+});
+
+// Resume polling tanpa reset offset (lanjut dari posisi terakhir)
+function _resumePolling(token, chatId) {
+  _stopPolling();
+  claimLeader();
+  tgPolling = setInterval(async () => {
+    if (!navigator.onLine || document.hidden) return;
+    try {
+      const r   = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${tgOffset}&limit=20&timeout=3`);
+      const txt = await r.text();
+      let d;
+      try { d = JSON.parse(txt); } catch(e) { return; }
+
+      if (!d.ok && d.error_code === 409) {
+        retryCount++;
+        if (retryCount <= 3) {
+          log(`⚠ Conflict (${retryCount}/3) — retry dalam 6 detik...`, 'system');
+          _stopPolling();
+          tgRetryTimer = setTimeout(() => _resumePolling(token, chatId), 6000);
+        } else {
+          log('❌ Conflict terus — klik STOP lalu START ulang', 'error');
+          stopTelegram(false);
+          retryCount = 0;
+        }
+        return;
+      }
+      if (!d.ok) { log(`❌ TG: ${d.description}`, 'error'); return; }
+      retryCount = 0;
+
+      for (const upd of d.result) {
+        tgOffset = upd.update_id + 1;
+        const msg = upd.message || upd.channel_post || upd.edited_message || upd.edited_channel_post;
+        if (!msg) continue;
+        const cid    = String(msg.chat.id);
+        const uname  = (msg.chat.username || '').toLowerCase();
+        const target = chatId.replace('@', '').toLowerCase();
+        if (cid !== chatId && uname !== target) continue;
+        const parts = [msg.text, msg.caption,
+          ...(msg.entities || []).map(e => e.url || ''),
+          ...(msg.caption_entities || []).map(e => e.url || '')
+        ].filter(Boolean);
+        const links = extractLinks(parts.join(' '));
+        if (links.length) {
+          log(`📨 [TG] ${(msg.chat.title || msg.chat.username || 'channel').substring(0, 28)}`, 'info');
+          links.forEach(l => addToQueue(l, 'Telegram'));
+        }
+      }
+    } catch(e) {}
+  }, 2000);
 }
 
 // ══════════════════════════════════════════════
@@ -700,7 +844,7 @@ function toggleOpt(key) {
 }
 
 // ══════════════════════════════════════════════
-// Init — load config, cek notif, TIDAK auto-start
+// Init
 // ══════════════════════════════════════════════
 loadConfig();
 
@@ -712,7 +856,7 @@ if (Notification.permission === 'granted') {
   setTimeout(() => document.getElementById('notif-bar').classList.add('show'), 2000);
 }
 
-log('🚀 DiscordHunt v1.2 siap', 'system');
+log('🚀 DiscordHunt v1.4 siap', 'system');
 log('▶ Pilih tipe → isi form → klik START', 'system');
 </script>
 </body>
